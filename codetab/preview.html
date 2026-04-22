@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; background: #fff; }
+    iframe { width: 100%; height: 100%; border: none; display: block; background: #fff; }
+  </style>
+</head>
+<body>
+  <iframe id="f" sandbox="allow-scripts"></iframe>
+  <script>
+    window.addEventListener('message', function(e) {
+      if (!e.data) return;
+      if (e.data.type === 'preview-update') {
+        document.getElementById('f').srcdoc = e.data.html;
+      } else if (e.data.source === 'codetab-console') {
+        window.parent.postMessage(e.data, '*');
+      }
+    });
+  </script>
+</body>
+</html>

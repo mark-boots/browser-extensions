@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "CodeTab",
+  "version": "1.0.0",
+  "description": "A live HTML/CSS/JS editor, one click away.",
+  "action": {
+    "default_title": "Open CodeTab"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "sandbox": {
+    "pages": ["preview.html"]
+  }
+}
