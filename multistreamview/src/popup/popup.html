@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>MultiStreamView</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div id="app">
+
+    <!-- Stream detected -->
+    <div id="stream-header" class="hidden">
+      <div class="state-title">Stream detected</div>
+      <div class="stream-row">
+        <span id="stream-badge" class="badge"></span>
+        <span id="stream-info" class="stream-info"></span>
+      </div>
+      <div class="state-desc">Choose a view to add this stream to:</div>
+    </div>
+
+    <!-- No stream -->
+    <div id="no-stream-header" class="hidden">
+      <div class="state-title">MultiStreamView</div>
+      <div class="state-desc">Open a view or manage your views:</div>
+    </div>
+
+    <div id="view-list"></div>
+
+    <div id="new-view-form" class="hidden">
+      <label class="form-label">New view name</label>
+      <input id="new-view-name" placeholder="e.g. F1 Weekend" autocomplete="off" />
+      <div class="form-btns">
+        <button id="btn-create">Create view</button>
+        <button id="btn-cancel" class="btn-secondary">Cancel</button>
+      </div>
+    </div>
+
+    <button id="btn-new-view" class="btn-ghost">+ Create new view</button>
+
+  </div>
+  <script src="popup.js" type="module"></script>
+</body>
+</html>
