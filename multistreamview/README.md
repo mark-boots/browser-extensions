@@ -32,7 +32,15 @@ After each build, click the reload icon on the extension card to pick up changes
 node scripts/publish.js
 ```
 
-Prompts for a version bump and release notes, then builds, zips, and submits to the Edge Add-ons API. Requires a `.env` file in this folder:
+Prompts for a version bump and release notes, then builds, zips, and submits to the Edge Add-ons API automatically.
+
+To manually create a zip for upload:
+
+```powershell
+powershell -Command "Compress-Archive -Path 'dist/*' -DestinationPath 'multistreamview-1.1.0.zip' -Force"
+```
+
+Requires a `.env` file in this folder:
 
 ```
 EDGE_CLIENT_ID=...
