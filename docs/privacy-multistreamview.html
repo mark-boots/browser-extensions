@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy – MultiStreamView</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, sans-serif;
+      background: #0e0e10;
+      color: #efeff1;
+      padding: 48px 24px;
+      max-width: 720px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+    a { color: #9147ff; }
+    .back { display: inline-block; margin-bottom: 32px; font-size: 13px; color: #9147ff; text-decoration: none; }
+    .back:hover { text-decoration: underline; }
+    h1 { font-size: 28px; margin-bottom: 8px; }
+    .meta { color: #adadb8; font-size: 13px; margin-bottom: 40px; }
+    h2 { font-size: 16px; margin: 32px 0 8px; color: #efeff1; }
+    p { color: #c8c8d0; font-size: 14px; margin-bottom: 12px; }
+    ul { color: #c8c8d0; font-size: 14px; padding-left: 20px; margin-bottom: 12px; }
+    ul li { margin-bottom: 6px; }
+  </style>
+</head>
+<body>
+  <a class="back" href="./index.html">← All extensions</a>
+
+  <h1>Privacy Policy</h1>
+  <p class="meta">MultiStreamView &nbsp;·&nbsp; Last updated: April 2026</p>
+
+  <h2>Overview</h2>
+  <p>
+    MultiStreamView is a browser extension that lets you watch multiple live streams from YouTube, Twitch, and Kick
+    simultaneously in a single tab, with an integrated chat sidebar. This policy explains what data the extension
+    handles and how.
+  </p>
+
+  <h2>Data we collect</h2>
+  <p>We collect <strong>no personal data</strong>. The extension does not transmit any information to external servers.</p>
+
+  <h2>Local storage</h2>
+  <p>The extension stores the following data <strong>locally in your browser</strong> using the browser's built-in storage API:</p>
+  <ul>
+    <li>The list of streams you have added (platform, channel name or video ID, layout role)</li>
+    <li>UI preferences per view (sidebar width and position, bar height, PiP size and corner, tab order)</li>
+    <li>View names and IDs you have created</li>
+  </ul>
+  <p>This data never leaves your device. It is not shared with us or any third party.</p>
+
+  <h2>Third-party content</h2>
+  <p>
+    The extension embeds stream players and chat widgets from YouTube, Twitch, and Kick via iframes.
+    When you add a stream, your browser connects directly to those platforms under their own terms and privacy policies:
+  </p>
+  <ul>
+    <li><a href="https://policies.google.com/privacy" target="_blank">YouTube / Google Privacy Policy</a></li>
+    <li><a href="https://www.twitch.tv/p/en/legal/privacy-notice/" target="_blank">Twitch Privacy Notice</a></li>
+    <li><a href="https://kick.com/privacy-policy" target="_blank">Kick Privacy Policy</a></li>
+  </ul>
+
+  <h2>Permissions</h2>
+  <p>The extension requests the following browser permissions:</p>
+  <ul>
+    <li><strong>storage</strong> – to save your layout and stream list locally</li>
+    <li><strong>tabs</strong> – to detect when you are on a supported stream page so the popup can offer to add it</li>
+    <li><strong>declarativeNetRequest</strong> – to allow stream iframes to load inside the extension page by removing frame-blocking headers</li>
+  </ul>
+
+  <h2>Contact</h2>
+  <p>
+    Questions? Reach out via
+    <a href="https://github.com/mark-boots/browser-extensions/issues" target="_blank">GitHub Issues</a>.
+  </p>
+</body>
+</html>
