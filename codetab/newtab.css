@@ -4,6 +4,17 @@
   padding: 0;
 }
 
+/* Lucide icons */
+.lucide {
+  display: block;
+  stroke: currentColor;
+  fill: none;
+}
+.layout-btn .lucide { width: 16px; height: 16px; }
+.pane-btn-icon .lucide { width: 13px; height: 13px; }
+#btn-settings .lucide { width: 13px; height: 13px; }
+.modal-close .lucide { width: 16px; height: 16px; }
+
 :root {
   --bg: #1b1b1b;
   --surface: #242424;
@@ -190,6 +201,14 @@ main[data-layout="right"] .editors { flex-direction: column; }
   min-width: 0;
 }
 
+.preview-pane.preview-expanded {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 999;
+}
+
 /* Split.js gutters */
 .gutter {
   background: var(--surface2);
@@ -206,6 +225,133 @@ main[data-layout="right"] .editors { flex-direction: column; }
 .gutter-vertical   { cursor: row-resize; }
 
 /* Pane label */
+.pane-warning {
+  background: #6b4c0a;
+  color: #ffd580;
+  font-size: 11px;
+  padding: 5px 14px;
+  border-bottom: 1px solid #8a6010;
+}
+
+.pane-warning.hidden {
+  display: none;
+}
+
+/* HTML meta popup */
+.pane-btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+}
+
+.pane-btn-icon.active {
+  color: var(--accent);
+}
+
+.html-meta-popup {
+  position: fixed;
+  z-index: 9999;
+  background: var(--surface);
+  border: 1px solid var(--surface2);
+  border-radius: 6px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  width: 256px;
+}
+
+.html-meta-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.html-meta-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+}
+
+.html-meta-input,
+.html-meta-textarea {
+  background: var(--bg);
+  border: 1px solid var(--surface2);
+  border-radius: 4px;
+  color: var(--text);
+  font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+  font-size: 12px;
+  padding: 5px 8px;
+  outline: none;
+  resize: none;
+}
+
+.html-meta-input:focus,
+.html-meta-textarea:focus {
+  border-color: var(--accent);
+}
+
+.html-meta-textarea {
+  height: 80px;
+  resize: vertical;
+}
+
+.resource-popup-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+.resource-popup-empty {
+  font-size: 11px;
+  color: var(--text-muted);
+  padding: 2px 0;
+}
+
+.resource-popup-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+  background: var(--bg);
+  border-radius: 3px;
+  padding: 3px 6px;
+  min-width: 0;
+}
+
+.resource-popup-item span {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text);
+}
+
+.resource-popup-remove {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 10px;
+  padding: 0 2px;
+  flex-shrink: 0;
+}
+
+.resource-popup-remove:hover {
+  color: #e06c75;
+}
+
+.resource-popup-add-row {
+  display: flex;
+  gap: 6px;
+}
+
 .pane-label {
   height: var(--label-h);
   background: var(--bg);
@@ -440,6 +586,30 @@ main[data-layout="right"] .editors { flex-direction: column; }
   gap: 6px;
 }
 
+.header-sep-thin {
+  width: 1px;
+  height: 16px;
+  background: var(--surface2);
+  flex-shrink: 0;
+}
+
+.header-toggle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.header-toggle input[type="checkbox"] {
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
 .pane-label-left::before {
   content: '';
   display: inline-block;
@@ -468,21 +638,18 @@ main[data-layout="right"] .editors { flex-direction: column; }
 }
 
 .settings-columns {
-  display: flex;
-  overflow: hidden;
-  flex: 1;
+  padding: 12px;
+  overflow-y: auto;
 }
 
 .settings-col {
-  flex: 1;
-  padding: 12px;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
 .settings-col-label {
+  display: none;
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
@@ -491,11 +658,6 @@ main[data-layout="right"] .editors { flex-direction: column; }
   padding: 4px 12px 8px;
 }
 
-.settings-divider {
-  width: 1px;
-  background: var(--surface2);
-  flex-shrink: 0;
-}
 
 .settings-row {
   display: flex;
@@ -688,117 +850,5 @@ main[data-layout="right"] .editors { flex-direction: column; }
   min-width: 32px;
 }
 
-/* Template modal */
-.modal-content--wide {
-  width: 680px;
-}
-
-.template-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  padding: 16px;
-  overflow-y: auto;
-}
-
-.template-card {
-  background: var(--bg);
-  border: 1px solid var(--surface2);
-  border-radius: 6px;
-  padding: 14px;
-  cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
-}
-
-.template-card:hover {
-  border-color: var(--accent);
-  background: rgba(71,207,115,0.05);
-}
-
-.template-card-name {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: 4px;
-}
-
-.template-card-desc {
-  font-size: 11px;
-  color: var(--text-muted);
-}
 
 /* External resources modal */
-.resources-body {
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  overflow-y: auto;
-}
-
-.resources-section-label {
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--text-muted);
-  margin-bottom: 8px;
-}
-
-.resources-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin-bottom: 8px;
-}
-
-.resource-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 10px;
-  background: var(--bg);
-  border-radius: 4px;
-  font-size: 12px;
-  font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
-  color: var(--text-muted);
-}
-
-.resource-item span {
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.resource-remove {
-  background: transparent;
-  border: none;
-  color: #e05c5c;
-  cursor: pointer;
-  padding: 0 4px;
-  font-size: 14px;
-  line-height: 1;
-  flex-shrink: 0;
-}
-
-.resources-add-row {
-  display: flex;
-  gap: 8px;
-}
-
-.resources-input {
-  flex: 1;
-  background: var(--bg);
-  border: 1px solid var(--surface2);
-  border-radius: 4px;
-  color: var(--text);
-  font-size: 12px;
-  font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
-  padding: 5px 10px;
-  outline: none;
-}
-
-.resources-input:focus {
-  border-color: var(--accent);
-}

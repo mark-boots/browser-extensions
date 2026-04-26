@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Pretty Json",
+  "version": "1.0.0",
+  "description": "Prettify raw JSON responses with syntax highlighting and a collapsible tree view.",
+  "permissions": ["storage"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_end"
+    },
+    {
+      "matches": ["<all_urls>"],
+      "js": ["expose.js"],
+      "run_at": "document_idle",
+      "world": "MAIN"
+    }
+  ]
+}

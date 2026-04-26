@@ -21,15 +21,11 @@ var CM = (() => {
   var editor_exports = {};
   __export(editor_exports, {
     Compartment: () => Compartment,
-    Decoration: () => Decoration,
     EditorState: () => EditorState,
     EditorView: () => EditorView,
     Prec: () => Prec,
-    RangeSetBuilder: () => RangeSetBuilder,
     StateEffect: () => StateEffect,
     StateField: () => StateField,
-    ViewPlugin: () => ViewPlugin,
-    WidgetType: () => WidgetType,
     basicSetup: () => basicSetup,
     css: () => css,
     dracula: () => dracula,
