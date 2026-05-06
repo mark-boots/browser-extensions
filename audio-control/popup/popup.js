@@ -1,38 +1,46 @@
-const slider        = document.getElementById('slider');
-const display       = document.getElementById('display');
-const resetBtn      = document.getElementById('reset');
-const bassSlider    = document.getElementById('bass');
-const bassDisplay   = document.getElementById('bass-display');
-const trebleSlider  = document.getElementById('treble');
-const trebleDisplay = document.getElementById('treble-display');
-const monoCheck     = document.getElementById('mono');
+const slider          = document.getElementById('slider');
+const display         = document.getElementById('display');
+const resetBtn        = document.getElementById('reset');
+const bassSlider      = document.getElementById('bass');
+const bassDisplay     = document.getElementById('bass-display');
+const trebleSlider    = document.getElementById('treble');
+const trebleDisplay   = document.getElementById('treble-display');
+const panSlider       = document.getElementById('pan');
+const panDisplay      = document.getElementById('pan-display');
+const compressCheck   = document.getElementById('compress');
+const monoCheck       = document.getElementById('mono');
 
 function formatGain(v) { return Math.round(v * 100) + '%'; }
 function formatDb(v)   { return (v > 0 ? '+' : '') + v + ' dB'; }
-
-async function getActiveTab() {
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  return tab;
+function formatPan(v)  {
+  if (v === 0) return 'Center';
+  const pct = Math.round(Math.abs(v) * 100);
+  return v < 0 ? `L ${pct}%` : `R ${pct}%`;
 }
+
+let tabId = null;
 
 async function init() {
-  const tab = await getActiveTab();
-  const keys = [`gain_${tab.id}`, `bass_${tab.id}`, `treble_${tab.id}`, `mono_${tab.id}`];
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  tabId = tab.id;
+  const keys = [`gain_${tabId}`, `bass_${tabId}`, `treble_${tabId}`, `mono_${tabId}`, `compress_${tabId}`, `pan_${tabId}`];
   const r = await chrome.storage.session.get(keys);
 
-  slider.value           = r[`gain_${tab.id}`]   ?? 1.0;
-  display.textContent    = formatGain(slider.value);
-  bassSlider.value       = r[`bass_${tab.id}`]   ?? 0;
-  bassDisplay.textContent = formatDb(bassSlider.value);
-  trebleSlider.value     = r[`treble_${tab.id}`] ?? 0;
+  slider.value              = r[`gain_${tabId}`]     ?? 1.0;
+  display.textContent       = formatGain(slider.value);
+  bassSlider.value          = r[`bass_${tabId}`]     ?? 0;
+  bassDisplay.textContent   = formatDb(bassSlider.value);
+  trebleSlider.value        = r[`treble_${tabId}`]   ?? 0;
   trebleDisplay.textContent = formatDb(trebleSlider.value);
-  monoCheck.checked      = r[`mono_${tab.id}`]   ?? false;
+  panSlider.value           = r[`pan_${tabId}`]      ?? 0;
+  panDisplay.textContent    = formatPan(parseFloat(panSlider.value));
+  compressCheck.checked     = r[`compress_${tabId}`] ?? false;
+  monoCheck.checked         = r[`mono_${tabId}`]     ?? false;
 }
 
-async function send(type, value, storageKey) {
-  const tab = await getActiveTab();
-  chrome.storage.session.set({ [`${storageKey}_${tab.id}`]: value });
-  chrome.tabs.sendMessage(tab.id, { type, value });
+function send(type, value, storageKey) {
+  chrome.storage.session.set({ [`${storageKey}_${tabId}`]: value });
+  chrome.tabs.sendMessage(tabId, { type, value });
 }
 
 slider.addEventListener('input', () => {
@@ -41,18 +49,21 @@ slider.addEventListener('input', () => {
   send('AC_SET_GAIN', v, 'gain');
 });
 
-resetBtn.addEventListener('click', async () => {
-  slider.value = 1;        display.textContent = formatGain(1);
-  bassSlider.value = 0;    bassDisplay.textContent = formatDb(0);
-  trebleSlider.value = 0;  trebleDisplay.textContent = formatDb(0);
+resetBtn.addEventListener('click', () => {
+  slider.value = 1;           display.textContent    = formatGain(1);
+  bassSlider.value = 0;       bassDisplay.textContent = formatDb(0);
+  trebleSlider.value = 0;     trebleDisplay.textContent = formatDb(0);
+  panSlider.value = 0;        panDisplay.textContent  = formatPan(0);
+  compressCheck.checked = false;
   monoCheck.checked = false;
-  const tab = await getActiveTab();
-  const id = tab.id;
-  await chrome.storage.session.set({ [`gain_${id}`]: 1.0, [`bass_${id}`]: 0, [`treble_${id}`]: 0, [`mono_${id}`]: false });
-  chrome.tabs.sendMessage(id, { type: 'AC_SET_GAIN',   value: 1.0 });
-  chrome.tabs.sendMessage(id, { type: 'AC_SET_BASS',   value: 0 });
-  chrome.tabs.sendMessage(id, { type: 'AC_SET_TREBLE', value: 0 });
-  chrome.tabs.sendMessage(id, { type: 'AC_SET_MONO',   value: false });
+  chrome.storage.session.set({ [`gain_${tabId}`]: 1.0, [`bass_${tabId}`]: 0, [`treble_${tabId}`]: 0, [`mono_${tabId}`]: false, [`compress_${tabId}`]: false, [`pan_${tabId}`]: 0 });
+  chrome.tabs.sendMessage(tabId, { type: 'AC_SET_GAIN',     value: 1.0 });
+  chrome.tabs.sendMessage(tabId, { type: 'AC_SET_BASS',     value: 0 });
+  chrome.tabs.sendMessage(tabId, { type: 'AC_SET_TREBLE',   value: 0 });
+  chrome.tabs.sendMessage(tabId, { type: 'AC_SET_MONO',     value: false });
+  chrome.tabs.sendMessage(tabId, { type: 'AC_SET_COMPRESS', value: false });
+  chrome.tabs.sendMessage(tabId, { type: 'AC_SET_PAN',      value: 0 });
+  chrome.tabs.sendMessage(tabId, { type: 'AC_SET_SINK',     value: '' });
 });
 
 bassSlider.addEventListener('input', () => {
@@ -67,8 +78,19 @@ trebleSlider.addEventListener('input', () => {
   send('AC_SET_TREBLE', v, 'treble');
 });
 
+panSlider.addEventListener('input', () => {
+  const v = parseFloat(panSlider.value);
+  panDisplay.textContent = formatPan(v);
+  send('AC_SET_PAN', v, 'pan');
+});
+
+compressCheck.addEventListener('change', () => {
+  send('AC_SET_COMPRESS', compressCheck.checked, 'compress');
+});
+
 monoCheck.addEventListener('change', () => {
   send('AC_SET_MONO', monoCheck.checked, 'mono');
 });
+
 
 init();

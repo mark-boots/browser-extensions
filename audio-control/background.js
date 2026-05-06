@@ -11,10 +11,12 @@ const TREBLE_CONTEXT_DEFAULT = 6;
 
 function keys(tabId) {
   return {
-    gain:   `gain_${tabId}`,
-    bass:   `bass_${tabId}`,
-    treble: `treble_${tabId}`,
-    mono:   `mono_${tabId}`,
+    gain:     `gain_${tabId}`,
+    bass:     `bass_${tabId}`,
+    treble:   `treble_${tabId}`,
+    mono:     `mono_${tabId}`,
+    compress: `compress_${tabId}`,
+    pan:      `pan_${tabId}`,
   };
 }
 
@@ -22,20 +24,24 @@ async function getSettings(tabId) {
   const k = keys(tabId);
   const r = await chrome.storage.session.get(Object.values(k));
   return {
-    gain:   r[k.gain]   ?? 1.0,
-    bass:   r[k.bass]   ?? 0,
-    treble: r[k.treble] ?? 0,
-    mono:   r[k.mono]   ?? false,
+    gain:     r[k.gain]     ?? 1.0,
+    bass:     r[k.bass]     ?? 0,
+    treble:   r[k.treble]   ?? 0,
+    mono:     r[k.mono]     ?? false,
+    compress: r[k.compress] ?? false,
+    pan:      r[k.pan]      ?? 0,
   };
 }
 
 async function applyStoredSettings(tabId) {
   const s = await getSettings(tabId);
   const send = (msg) => chrome.tabs.sendMessage(tabId, msg).catch(() => {});
-  if (s.gain !== 1.0)    send({ type: 'AC_SET_GAIN',   value: s.gain });
-  if (s.bass !== 0)      send({ type: 'AC_SET_BASS',   value: s.bass });
-  if (s.treble !== 0)    send({ type: 'AC_SET_TREBLE', value: s.treble });
-  if (s.mono)            send({ type: 'AC_SET_MONO',   value: s.mono });
+  if (s.gain !== 1.0)    send({ type: 'AC_SET_GAIN',     value: s.gain });
+  if (s.bass !== 0)      send({ type: 'AC_SET_BASS',     value: s.bass });
+  if (s.treble !== 0)    send({ type: 'AC_SET_TREBLE',   value: s.treble });
+  if (s.mono)            send({ type: 'AC_SET_MONO',     value: s.mono });
+  if (s.compress)        send({ type: 'AC_SET_COMPRESS', value: s.compress });
+  if (s.pan !== 0)       send({ type: 'AC_SET_PAN',      value: s.pan });
 }
 
 function menuTitle(s) {
@@ -43,7 +49,10 @@ function menuTitle(s) {
   if (s.gain !== 1.0)  parts.push(`${Math.round(s.gain * 100)}%`);
   if (s.bass !== 0)    parts.push('Bass');
   if (s.treble !== 0)  parts.push('Treble');
+  if (s.compress)      parts.push('Compress');
   if (s.mono)          parts.push('Mono');
+  if (s.pan < 0)       parts.push('Pan L');
+  if (s.pan > 0)       parts.push('Pan R');
   return parts.length ? `Audio Control — ${parts.join(' · ')}` : 'Audio Control';
 }
 
@@ -52,6 +61,7 @@ function updateMenu(s) {
   PRESETS.forEach(p => chrome.contextMenus.update(p.id, { checked: p.value === s.gain }));
   chrome.contextMenus.update('bass-boost',   { checked: s.bass !== 0 });
   chrome.contextMenus.update('treble-boost', { checked: s.treble !== 0 });
+  chrome.contextMenus.update('compress',     { checked: s.compress });
   chrome.contextMenus.update('mono',         { checked: s.mono });
 }
 
@@ -81,6 +91,7 @@ chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({ id: 'sep-2', parentId: 'audio-control', type: 'separator', contexts: ['all'] });
   chrome.contextMenus.create({ id: 'bass-boost',   parentId: 'audio-control', type: 'checkbox', title: 'Bass boost',   checked: false, contexts: ['all'] });
   chrome.contextMenus.create({ id: 'treble-boost', parentId: 'audio-control', type: 'checkbox', title: 'Treble boost', checked: false, contexts: ['all'] });
+  chrome.contextMenus.create({ id: 'compress',     parentId: 'audio-control', type: 'checkbox', title: 'Compress',     checked: false, contexts: ['all'] });
   chrome.contextMenus.create({ id: 'mono',         parentId: 'audio-control', type: 'checkbox', title: 'Mono',         checked: false, contexts: ['all'] });
 });
 
@@ -97,13 +108,15 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 
   if (info.menuItemId === 'reset-all') {
     const k = keys(tab.id);
-    await chrome.storage.session.set({ [k.gain]: 1.0, [k.bass]: 0, [k.treble]: 0, [k.mono]: false });
+    await chrome.storage.session.set({ [k.gain]: 1.0, [k.bass]: 0, [k.treble]: 0, [k.mono]: false, [k.compress]: false, [k.pan]: 0 });
     const send = (msg) => chrome.tabs.sendMessage(tab.id, msg).catch(() => {});
-    send({ type: 'AC_SET_GAIN',   value: 1.0 });
-    send({ type: 'AC_SET_BASS',   value: 0 });
-    send({ type: 'AC_SET_TREBLE', value: 0 });
-    send({ type: 'AC_SET_MONO',   value: false });
-    updateMenu({ gain: 1.0, bass: 0, treble: 0, mono: false });
+    send({ type: 'AC_SET_GAIN',     value: 1.0 });
+    send({ type: 'AC_SET_BASS',     value: 0 });
+    send({ type: 'AC_SET_TREBLE',   value: 0 });
+    send({ type: 'AC_SET_MONO',     value: false });
+    send({ type: 'AC_SET_COMPRESS', value: false });
+    send({ type: 'AC_SET_PAN',      value: 0 });
+    updateMenu({ gain: 1.0, bass: 0, treble: 0, mono: false, compress: false, pan: 0 });
     return;
   }
 
@@ -118,6 +131,10 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     s.treble = info.checked ? TREBLE_CONTEXT_DEFAULT : 0;
     await chrome.storage.session.set({ [k.treble]: s.treble });
     chrome.tabs.sendMessage(tab.id, { type: 'AC_SET_TREBLE', value: s.treble });
+  } else if (info.menuItemId === 'compress') {
+    s.compress = info.checked;
+    await chrome.storage.session.set({ [k.compress]: s.compress });
+    chrome.tabs.sendMessage(tab.id, { type: 'AC_SET_COMPRESS', value: s.compress });
   } else if (info.menuItemId === 'mono') {
     s.mono = info.checked;
     await chrome.storage.session.set({ [k.mono]: s.mono });

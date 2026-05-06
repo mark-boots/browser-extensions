@@ -1,4 +1,4 @@
-const PASSTHROUGH = ['AC_SET_GAIN', 'AC_SET_BASS', 'AC_SET_TREBLE', 'AC_SET_MONO'];
+const PASSTHROUGH = ['AC_SET_GAIN', 'AC_SET_BASS', 'AC_SET_TREBLE', 'AC_SET_MONO', 'AC_SET_COMPRESS', 'AC_SET_PAN'];
 
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   if (PASSTHROUGH.includes(msg.type)) {

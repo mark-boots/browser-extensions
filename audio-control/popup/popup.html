@@ -26,12 +26,24 @@
       </div>
       <input type="range" id="treble" min="-10" max="10" step="0.5" value="0" />
 
+      <div class="filter-row">
+        <span class="filter-label">Pan</span>
+        <span class="filter-value" id="pan-display">Center</span>
+      </div>
+      <input type="range" id="pan" min="-1" max="1" step="0.05" value="0" />
+
       <div class="divider"></div>
+
+      <label class="toggle">
+        <input type="checkbox" id="compress" />
+        <span>Compress</span>
+      </label>
 
       <label class="toggle">
         <input type="checkbox" id="mono" />
         <span>Mono</span>
       </label>
+
 
     </div>
     <script src="popup.js"></script>
